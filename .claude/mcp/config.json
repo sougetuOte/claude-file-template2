@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "memory-bank": {
+      "command": "node",
+      "args": [".claude/mcp/memory-server/index.js"],
+      "env": {
+        "PROJECT_PATH": "."
+      },
+      "description": "Memory Bank 2.0 - SQLite知識管理システム",
+      "version": "2.0.0",
+      "capabilities": {
+        "tools": true,
+        "resources": false
+      },
+      "security": {
+        "sandboxed": true,
+        "maxRequestSize": "10KB",
+        "rateLimit": 100
+      }
+    }
+  },
+  "settings": {
+    "enableLogging": true,
+    "logLevel": "info",
+    "security": {
+      "enforceValidation": true,
+      "allowedMethods": [
+        "initialize",
+        "tools/list", 
+        "tools/call"
+      ]
+    }
+  }
+}

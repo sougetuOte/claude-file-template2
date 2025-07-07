@@ -1,0 +1,23 @@
+{
+  "name": "memory-bank-mcp-server",
+  "version": "2.0.0",
+  "description": "Memory Bank 2.0 MCP Server - SQLite knowledge management with security",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "test": "node dist/test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "keywords": ["mcp", "memory-bank", "knowledge-management", "sqlite"],
+  "author": "Claude Code Assistant",
+  "license": "MIT"
+}
