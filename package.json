@@ -1,13 +1,13 @@
 {
-  "name": "claude-file-template",
-  "version": "1.0.0",
-  "description": "Claude Code lightweight project template for personal development",
-  "keywords": ["claude", "template", "development", "memory-bank", "personal-development"],
+  "name": "claude-file-template2",
+  "version": "2.0.0",
+  "description": "Claude Code Memory Bank 2.0 template with SQLite knowledge management, MCP integration, and AI quality monitoring",
+  "keywords": ["claude", "template", "development", "memory-bank", "ai-development", "sqlite", "mcp", "knowledge-management"],
   "author": "Claude Code Template",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sougetuOte/claude-file-template.git"
+    "url": "https://github.com/sougetuOte/claude-file-template2.git"
   },
-  "homepage": "https://github.com/sougetuOte/claude-file-template#readme"
+  "homepage": "https://github.com/sougetuOte/claude-file-template2#readme"
 }

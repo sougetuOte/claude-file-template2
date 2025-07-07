@@ -64,3 +64,25 @@ temp/
 
 # Project specific ignores
 # Add your project-specific files here
+
+# Memory Bank 2.0 generated files
+.claude/index/knowledge.db
+.claude/index/.last_organize
+.claude/logs/
+*.test.py
+test_*.py
+
+# Development/work files
+draft/
+mcps.md
+mcp-install-result.md
+*.backup.*
+
+# MCP server files
+.claude/mcp/memory-server/node_modules/
+.claude/mcp/memory-server/package-lock.json
+.claude/mcp/memory-server/.claude/
+
+# Quality monitoring temp files
+.claude/quality/temp/
+*.analysis.json
