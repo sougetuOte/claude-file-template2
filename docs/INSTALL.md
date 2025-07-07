@@ -27,8 +27,8 @@ git --version       # Git確認
 git clone https://github.com/sougetuOte/claude-file-template2.git my-project
 cd my-project
 
-# 2. テンプレート用ファイルを削除（既に配布用にクリーンアップ済み）
-rm -rf .git
+# 2. テンプレート用ファイルを削除  
+rm -rf .git docs/
 
 # 3. 新しいGitリポジトリとして初期化
 git init
