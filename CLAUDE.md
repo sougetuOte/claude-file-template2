@@ -25,6 +25,24 @@
 - 完了済み情報: @.claude/archive/
 - Hooks設定: @.claude/hooks.yaml
 
+### Memory Bank 2.0 (Phase 1)
+- **知識データベース**: `.claude/index/knowledge.db` (SQLite + FTS5)
+- **知識管理API**: `.claude/index/knowledge_store.py`
+- **Markdown同期**: `.claude/index/sync_markdown.py`
+- **コマンドライン**: `python .claude/commands/k_command.py`
+
+### Memory Bank 2.0 (Phase 2) - MCP統合
+- **MCPサーバー**: `.claude/mcp/memory-server/index.js` (Node.js)
+- **Python Bridge**: `.claude/mcp/memory-server/bridge.py` (セキュア)
+- **MCP設定**: `.claude/mcp/config.json` (CVE-2025-49596対策)
+- **テストスイート**: `.claude/mcp/memory-server/test-mcp.js`
+
+### Memory Bank 2.0 (Phase 3) - 高度な機能
+- **AI生成コード品質モニター**: `.claude/quality/code_monitor.py` (重複検出・品質改善)
+- **簡易タスクコーディネーター**: `.claude/agents/simple_coordinator.py` (モード提案・ワークフロー)
+- **知識自動整理システム**: `.claude/index/auto_organize.py` (パターン抽出・アーカイブ)
+- **自動実行Hooks**: `.claude/hooks.yaml` (コード変更時の品質チェック)
+
 ## カスタムコマンド
 | コマンド | 用途 | 詳細 |
 |---------|------|------|
@@ -35,6 +53,7 @@
 | `/debug:start` | デバッグ特化 | @.claude/commands/debug-start.md |
 | `/feature:plan` | 新機能設計 | @.claude/commands/feature-plan.md |
 | `/review:check` | コードレビュー | @.claude/commands/review-check.md |
+| `/k` | 知識管理 | @.claude/commands/knowledge.md |
 
 ## 開発ガイドライン
 - **開発全般**: @.claude/guidelines/development.md

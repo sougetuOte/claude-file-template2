@@ -55,6 +55,54 @@ hooks:
         # echo "$CLAUDE_OUTPUT" >> .claude/logs/commits.log
       fi
 
+  # Memory Bank 2.0: Markdown同期
+  - event: PostToolUse
+    matcher:
+      tool: [Edit, Write, MultiEdit]
+      glob: ".claude/**/*.md"
+    command: |
+      # Markdownファイル変更時に知識DBと同期
+      if command -v python3 >/dev/null 2>&1; then
+        echo "📝 Memory Bank同期中..."
+        python3 .claude/index/sync_markdown.py
+      fi
+
+  # Phase 3: AI生成コード品質モニター
+  - event: PostToolUse
+    matcher:
+      tool: [Write, Edit]
+      glob: "*.py"
+    command: |
+      # Pythonファイル変更時に重複チェック
+      if command -v python3 >/dev/null 2>&1 && [ -f .claude/quality/code_monitor.py ]; then
+        echo "🔍 コード品質チェック中..."
+        python3 .claude/quality/code_monitor.py check "$CLAUDE_FILE_PATHS" || true
+      fi
+
+  # Phase 3: 知識自動整理（週1回）
+  - event: SessionStart
+    command: |
+      # 最後の整理から7日経過していたら実行
+      if [ ! -f .claude/index/.last_organize ] || \
+         [ $(find .claude/index/.last_organize -mtime +7 2>/dev/null | wc -l) -gt 0 ]; then
+        if command -v python3 >/dev/null 2>&1 && [ -f .claude/index/auto_organize.py ]; then
+          echo "🗂️  知識ベース整理中..."
+          python3 .claude/index/auto_organize.py organize >/dev/null 2>&1 || true
+          touch .claude/index/.last_organize
+        fi
+      fi
+
+  # Phase 3: コードファイル品質チェック（軽量版）
+  - event: PostToolUse
+    matcher:
+      tool: [Write, Edit]
+      glob: "*.{js,ts,jsx,tsx}"
+    command: |
+      # JavaScript/TypeScriptファイル変更時の簡易チェック
+      if command -v python3 >/dev/null 2>&1 && [ -f .claude/quality/code_monitor.py ]; then
+        python3 .claude/quality/code_monitor.py check "$CLAUDE_FILE_PATHS" | grep -E "(duplicate_found|suggestions)" || true
+      fi
+
 # 環境変数設定
 env:
   CLAUDE_HOOKS_ENABLED: true
