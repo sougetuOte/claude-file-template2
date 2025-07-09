@@ -139,6 +139,9 @@ python .claude/agents/simple_coordinator.py test
 
 # 4. 知識自動整理
 python .claude/index/auto_organize.py test
+
+# 5. セキュリティ機能
+python .claude/scripts/test_security.py
 ```
 
 ### Claude Codeでの動作確認

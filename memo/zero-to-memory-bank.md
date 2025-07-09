@@ -77,6 +77,21 @@ EOF
 # .gitignore更新
 echo ".ccache/" >> .gitignore
 echo "*.cache" >> .gitignore
+
+# セキュリティ設定（基本的な危険コマンドブロック）
+cat >> .claude/settings.json << 'EOF'
+{
+  "permissions": {
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(chmod 777 *)",
+      "Bash(curl *)",
+      "Bash(wget *)"
+    ]
+  }
+}
+EOF
 ```
 
 #### 1.3 現状のスナップショット作成
@@ -103,6 +118,7 @@ cache_control: {"type": "ephemeral"}
 #### 期待効果
 - **即座**: プロンプトキャッシュによる90%コスト削減
 - **心理**: 「情報整理の場所」の確保
+- **安全性**: 基本的な危険コマンドのブロック
 
 ### Stage 2: 情報集約（Week 2-3）- 影響度：小
 
@@ -366,6 +382,7 @@ A: 利用価値の再確認。新機能・改善の継続的導入
 - [ ] .gitignore更新
 - [ ] overview.md暫定版作成
 - [ ] キャッシュ効果確認
+- [ ] 基本セキュリティ設定（settings.jsonへのdeny追加）
 
 ### Stage 2（情報集約）
 - [ ] 既存情報のtech.md移行

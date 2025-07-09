@@ -12,9 +12,10 @@
 ### 🟡 段階導入推奨（リスク：低）
 4. **ADRシステム**
 5. **技術負債トラッキング**
+6. **セキュリティ強化**
 
 ### 🔴 慎重検討必要（リスク：中）
-6. **Memory Bank構造変更**
+7. **Memory Bank構造変更**
 
 ---
 
@@ -174,6 +175,76 @@ touch .claude/context/debt.md
 - **中期**: 計画的な負債解決
 - **長期**: 負債発生の予防
 
+### 2.3 セキュリティ強化
+
+#### 思想
+- **Claude Code安全性向上**: `--dangerously-skip-permissions`使用時の安全性確保
+- **危険コマンドの自動ブロック**: 破壊的操作の事前防止
+- **セキュリティログ**: 全コマンドの実行記録・監査
+
+#### 導入手順
+
+**Step 1: settings.jsonへのセキュリティ設定追加**
+```json
+// .claude/settings.json に追加
+{
+  "permissions": {
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(chmod 777 *)",
+      "Bash(curl *)",
+      "Bash(wget *)"
+    ]
+  }
+}
+```
+
+**Step 2: セキュリティスクリプトの配置**
+```bash
+# scriptsディレクトリ作成
+mkdir -p .claude/scripts
+
+# セキュリティバリデーター（テンプレートから）
+cp [template]/claude/scripts/bash_security_validator.py .claude/scripts/
+cp [template]/claude/scripts/deny-check.sh .claude/scripts/
+cp [template]/claude/scripts/test_security.py .claude/scripts/
+
+# 実行権限付与
+chmod +x .claude/scripts/*.py
+chmod +x .claude/scripts/*.sh
+```
+
+**Step 3: hooksへのセキュリティ統合**
+```yaml
+# .claude/hooks.yaml に追加
+hooks:
+  - event: PreToolUse
+    matcher:
+      tool: Bash
+    command: |
+      echo "🔒 セキュリティチェック実行中..." >&2
+      python3 .claude/scripts/bash_security_validator.py
+```
+
+**Step 4: 動作確認**
+```bash
+# セキュリティテストの実行
+python3 .claude/scripts/test_security.py
+
+# 期待結果: 全テストが通過
+```
+
+#### 推奨運用
+- **定期テスト**: 月1回のセキュリティテスト実行
+- **ログ監視**: 週1回のセキュリティログ確認
+- **ルール調整**: プロジェクトに応じた危険コマンドパターンの調整
+
+#### 期待効果
+- **即時**: 危険コマンドの自動ブロック
+- **短期**: セキュリティインシデントの予防
+- **長期**: 安全なClaude Code利用習慣の定着
+
 ---
 
 ## ⚠️ 段階3: 慎重検討必要（所要時間：1-2時間）
@@ -227,6 +298,10 @@ mkdir -p .claude/commands
 - [ ] 負債ログファイル作成
 - [ ] 既存負債の棚卸し完了
 - [ ] 運用ルール設定・チーム共有
+- [ ] セキュリティ設定追加（settings.json）
+- [ ] セキュリティスクリプト配置・権限設定
+- [ ] hooksにセキュリティ統合
+- [ ] セキュリティテスト実行・確認
 
 ### Phase 3（慎重検討）
 - [ ] チーム合意取得

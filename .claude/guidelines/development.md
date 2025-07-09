@@ -78,3 +78,29 @@
 - リントチェック
 - 型チェック
 - 単体テスト実行
+
+## 6. セキュリティ対策
+
+### Claude Code セキュリティ機能
+- **危険コマンドブロック**: `settings.json` で定義された危険パターンを自動ブロック
+- **PreToolUseフック**: コマンド実行前の詳細検証
+- **コマンドログ**: 全てのbashコマンドの実行記録
+- **セキュリティテスト**: `python3 .claude/scripts/test_security.py` で定期検証
+
+### 危険なコマンドの例
+⚠️ 以下のコマンドは自動的にブロックされます：
+- `sudo`, `su` - 権限昇格
+- `rm -rf /`, `rm -rf ~/` - 破壊的削除
+- `curl`, `wget` - 外部ネットワークアクセス
+- `chmod 777` - 危険な権限変更
+
+### セキュリティログの確認
+```bash
+# セキュリティイベントの確認
+cat .claude/logs/security.log
+
+# コマンド履歴の確認
+cat .claude/logs/command_history.log
+```
+
+詳細: @.claude/security/README.md

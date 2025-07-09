@@ -2,6 +2,31 @@
 # このファイルはプロジェクト固有の自動化を定義します
 
 hooks:
+  # セキュリティ: 危険なコマンドの事前チェック
+  - event: PreToolUse
+    matcher:
+      tool: Bash
+    command: |
+      # セキュリティバリデーターによる事前チェック
+      echo "🔒 セキュリティチェック実行中..." >&2
+      python3 .claude/scripts/bash_security_validator.py
+
+  # セキュリティ: コマンド実行ログの記録
+  - event: PostToolUse
+    matcher:
+      tool: Bash
+    command: |
+      # コマンド実行ログを記録
+      LOG_FILE=".claude/logs/command_history.log"
+      mkdir -p "$(dirname "$LOG_FILE")"
+      TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+      echo "[$TIMESTAMP] [$CLAUDE_EXIT_CODE] $CLAUDE_COMMAND" >> "$LOG_FILE"
+      
+      # 危険なコマンドの実行を特別にログ記録
+      if echo "$CLAUDE_COMMAND" | grep -E "(sudo|rm|chmod|curl|wget|git config --global)" >/dev/null 2>&1; then
+        echo "[$TIMESTAMP] [SECURITY-ALERT] Potentially dangerous command executed: $CLAUDE_COMMAND" >> .claude/logs/security.log
+      fi
+
   # コード品質の自動チェック
   - event: PostToolUse
     matcher:

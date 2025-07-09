@@ -7,8 +7,9 @@
 3. [モード切り替え](#モード切り替え)
 4. [知識管理](#知識管理)
 5. [コード品質監視](#コード品質監視)
-6. [自動化機能](#自動化機能)
-7. [トラブルシューティング](#トラブルシューティング)
+6. [セキュリティ機能](#セキュリティ機能)
+7. [自動化機能](#自動化機能)
+8. [トラブルシューティング](#トラブルシューティング)
 
 ## 🎯 基本概念
 
@@ -203,6 +204,160 @@ python .claude/quality/code_monitor.py analyze
   ]
 }
 ```
+
+## 🛡️ セキュリティ機能
+
+### Claude Code セキュリティシステム
+v2.0では`--dangerously-skip-permissions`使用時でも安全にClaude Codeを利用できるセキュリティシステムを実装しています。
+
+#### 多層防御システム
+```bash
+# 1. settings.json による事前ブロック
+# 2. PreToolUseフック による詳細検証
+# 3. PostToolUseフック による実行ログ記録
+# 4. セキュリティテスト による継続的な検証
+```
+
+### 危険コマンドの自動ブロック
+
+#### 🚫 ブロック対象コマンド
+以下のコマンドは実行前に自動的にブロックされます：
+
+```bash
+# 権限昇格
+sudo, su
+
+# 破壊的削除
+rm -rf /, rm -rf ~/, rm -rf *
+
+# 危険な権限変更
+chmod 777, chmod -R 777
+
+# 外部ネットワークアクセス
+curl, wget, nc, netcat
+
+# システム変更
+systemctl, service, mount, umount
+
+# パッケージ管理
+apt install, yum install, pip install, npm install -g
+
+# その他危険な操作
+git config --global, crontab, fdisk, mkfs
+```
+
+#### ⚠️ 警告レベルコマンド
+以下のコマンドは警告付きで実行されます：
+
+```bash
+# Git危険操作
+git push --force, git reset --hard, git clean -fd
+
+# パッケージ削除
+npm uninstall, pip uninstall
+
+# Docker操作
+docker rm, docker rmi
+```
+
+### セキュリティテスト
+
+#### 自動テスト実行
+```bash
+# セキュリティテストスイートの実行
+python3 .claude/scripts/test_security.py
+
+# テスト結果例
+🔒 Claude Code セキュリティテスト開始
+✅ 安全なコマンドのテスト: 8/8 通過
+🚫 危険なコマンドのテスト: 8/8 ブロック
+💡 改善提案のテスト: 4/4 動作確認
+```
+
+#### 手動テスト
+```bash
+# 個別コマンドのテスト
+echo '{"tool": "Bash", "command": "echo hello"}' | python3 .claude/scripts/bash_security_validator.py
+
+# 危険コマンドのテスト
+echo '{"tool": "Bash", "command": "sudo rm -rf /"}' | python3 .claude/scripts/bash_security_validator.py
+```
+
+### セキュリティログ
+
+#### ログファイルの場所
+- **セキュリティログ**: `.claude/logs/security.log`
+- **コマンド履歴**: `.claude/logs/command_history.log`
+
+#### ログの確認
+```bash
+# セキュリティイベントの確認
+tail -f .claude/logs/security.log
+
+# 危険なコマンドのアラート確認
+grep "SECURITY-ALERT" .claude/logs/security.log
+
+# 最近のコマンド実行履歴
+tail -20 .claude/logs/command_history.log
+```
+
+### コマンド改善提案
+
+#### 💡 推奨コマンド
+システムがより安全・効率的なコマンドを自動提案します：
+
+```bash
+grep → rg (ripgrep)          # 高速・多機能検索
+find → fd                    # 高速ファイル検索
+cat → batcat                 # シンタックスハイライト
+ls → eza --icons --git       # カラフル・Git統合表示
+```
+
+### 緊急時の対応
+
+#### セキュリティフックの一時無効化
+```bash
+# 環境変数で一時無効化
+export CLAUDE_HOOKS_ENABLED=false
+
+# 設定ファイルで無効化
+# .claude/settings.json から hooks セクションを削除
+```
+
+#### 問題発生時の対処
+1. **コマンドが実行された場合**
+   - 即座に実行を中止（Ctrl+C）
+   - セキュリティログを確認
+   - 必要に応じてシステム状態を検証
+
+2. **誤検知の場合**
+   - 一時的にフックを無効化
+   - 必要に応じて`.claude/scripts/bash_security_validator.py`のパターンを調整
+
+### カスタマイズ
+
+#### セキュリティルールの追加
+```python
+# .claude/scripts/bash_security_validator.py の編集例
+dangerous_patterns = [
+    # 既存パターン...
+    (r"your_custom_pattern", "カスタムメッセージ"),
+]
+```
+
+#### プロジェクト固有の設定
+```json
+// .claude/settings.json でプロジェクト固有の危険コマンドを追加
+{
+  "permissions": {
+    "deny": [
+      "Bash(project_specific_dangerous_command)"
+    ]
+  }
+}
+```
+
+詳細なセキュリティ設定: @.claude/security/README.md
 
 ## 🤖 自動化機能
 
