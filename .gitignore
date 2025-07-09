@@ -41,10 +41,17 @@ obj/
 .env
 .env.local
 .env.*.local
+.devcontainer/.env
+.devcontainer/*.env
+!.devcontainer/.env.example
 
 # Logs
 *.log
 logs/
+
+# DevContainer files
+.devcontainer-bash_history
+.devcontainer-zsh_history
 
 # Temporary files
 tmp/
@@ -68,6 +75,7 @@ temp/
 # Memory Bank 2.0 generated files
 .claude/index/knowledge.db
 .claude/index/.last_organize
+.claude/index/.last_sync_times
 .claude/logs/
 *.test.py
 test_*.py
