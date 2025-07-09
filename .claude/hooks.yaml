@@ -142,6 +142,38 @@ hooks:
         python3 .claude/quality/code_monitor.py check "$CLAUDE_FILE_PATHS" || true
       fi
 
+  # Vibe Logger統合: Pythonエラー時の構造化ログ
+  - event: PostToolUse
+    matcher:
+      tool: Bash
+      command_contains: "python"
+    command: |
+      # エラー発生時にvibe-loggerで記録（vibeloggerがインストールされている場合のみ）
+      if [ $CLAUDE_EXIT_CODE -ne 0 ] && python3 -c "import vibelogger" 2>/dev/null; then
+        python3 -c "
+import os
+import sys
+sys.path.insert(0, '.claude')
+try:
+    from vibe.sync_vibe_logs import vibe_log
+    vibe_log(
+        level='ERROR',
+        operation='python_execution',
+        message='Pythonスクリプト実行エラー',
+        context={
+            'command': '$CLAUDE_COMMAND',
+            'exit_code': $CLAUDE_EXIT_CODE,
+            'working_dir': '$PWD',
+            'file': '$(echo \"$CLAUDE_COMMAND\" | grep -oE \"[^ ]+\\.py\" | head -1 || echo \"unknown\")'
+        },
+        human_note='AI-DEBUG: このエラーの原因を調査して修正案を提示してください'
+    )
+except Exception as e:
+    # vibe logger統合が失敗しても続行
+    pass
+" 2>/dev/null || true
+      fi
+
   # Phase 3: 知識自動整理（週1回）
   - event: SessionStart
     command: |
@@ -193,6 +225,31 @@ hooks:
       # JavaScript/TypeScriptファイル変更時の簡易チェック
       if command -v python3 >/dev/null 2>&1 && [ -f .claude/quality/code_monitor.py ]; then
         python3 .claude/quality/code_monitor.py check "$CLAUDE_FILE_PATHS" | grep -E "(duplicate_found|suggestions)" || true
+      fi
+
+  # Vibe Logger統合: Node.js/TypeScriptエラー時の構造化ログ
+  - event: PostToolUse
+    matcher:
+      tool: Bash
+      command_contains: "node"
+    command: |
+      # Node.jsエラー時にvibe-loggerで記録（vibeloggerがインストールされている場合のみ）
+      if [ $CLAUDE_EXIT_CODE -ne 0 ] && npm list -g vibelogger >/dev/null 2>&1; then
+        node -e "
+const { createFileLogger } = require('vibelogger');
+const logger = createFileLogger('claude_project_node');
+logger.error({
+    operation: 'node_execution',
+    message: 'Node.jsスクリプト実行エラー',
+    context: {
+        command: '$CLAUDE_COMMAND',
+        exitCode: $CLAUDE_EXIT_CODE,
+        workingDir: '$PWD',
+        file: '$CLAUDE_COMMAND'.match(/[^ ]+\\.(?:js|ts)/) ? '$CLAUDE_COMMAND'.match(/[^ ]+\\.(?:js|ts)/)[0] : 'unknown'
+    },
+    humanNote: 'AI-DEBUG: このNode.jsエラーの原因を調査して修正案を提示してください'
+});
+" 2>/dev/null || true
       fi
       
   # Memory Bank 2.0: 重要ファイルのスマート同期
