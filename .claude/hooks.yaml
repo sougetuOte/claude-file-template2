@@ -11,6 +11,32 @@ hooks:
       echo "🔒 セキュリティチェック実行中..." >&2
       python3 .claude/scripts/bash_security_validator.py
 
+  # セキュリティ強化: 高リスクコマンドの詳細チェック
+  - event: PreToolUse
+    matcher:
+      tool: Bash
+    command: |
+      if echo "$CLAUDE_COMMAND" | grep -E "(rm -rf|sudo|curl.*-X|wget.*-O)" >/dev/null 2>&1; then
+        echo "⚠️  高リスクコマンド検出: $CLAUDE_COMMAND" >&2
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [HIGH-RISK] $CLAUDE_COMMAND" >> .claude/logs/security.log
+        # 5秒待機（キャンセル可能）
+        sleep 5 || true
+      fi
+
+  # コミット前自動フォーマット
+  - event: PreToolUse
+    matcher:
+      tool: Bash
+      command_contains: "git commit"
+    command: |
+      if command -v prettier >/dev/null 2>&1 && [ -f .prettierrc ]; then
+        echo "✨ コミット前自動フォーマット実行中..."
+        # ステージされたファイルのみフォーマット
+        git diff --cached --name-only --diff-filter=ACM | xargs prettier --write 2>/dev/null || true
+        # フォーマット後に再ステージング
+        git add -u 2>/dev/null || true
+      fi
+
   # セキュリティ: コマンド実行ログの記録
   - event: PostToolUse
     matcher:
@@ -42,6 +68,18 @@ hooks:
       elif command -v python >/dev/null 2>&1 && [ -f requirements.txt ]; then
         python -m flake8 $CLAUDE_FILE_PATHS 2>/dev/null || true
         python -m mypy $CLAUDE_FILE_PATHS 2>/dev/null || true
+      fi
+
+  # 依存関係自動更新チェック（軽量版）
+  - event: PostToolUse
+    matcher:
+      tool: [Edit, Write]
+      glob: "package.json"
+    command: |
+      if command -v npm >/dev/null 2>&1; then
+        echo "📦 package.json更新を検出"
+        # 軽量チェック：依存関係の構文確認のみ
+        npm ls --depth=0 --silent 2>/dev/null || echo "⚠️  依存関係に問題がある可能性があります"
       fi
 
   # テスト成功時の自動記録
@@ -115,6 +153,21 @@ hooks:
           python3 .claude/index/auto_organize.py organize >/dev/null 2>&1 || true
           touch .claude/index/.last_organize
         fi
+      fi
+
+  # バッチ処理（MultiEdit時の効率化）
+  - event: PostToolUse
+    matcher:
+      tool: [MultiEdit]
+    command: |
+      echo "🔄 MultiEdit後バッチ処理実行中..."
+      # 順次実行でエラーを個別にハンドリング
+      if command -v npm >/dev/null 2>&1 && [ -f package.json ]; then
+        npm run lint --if-present --silent 2>/dev/null || echo "lint: 警告あり"
+        npm run typecheck --if-present --silent 2>/dev/null || echo "typecheck: 警告あり"
+      fi
+      if command -v python3 >/dev/null 2>&1 && [ -f .claude/quality/code_monitor.py ]; then
+        python3 .claude/quality/code_monitor.py check "$CLAUDE_FILE_PATHS" 2>/dev/null || echo "code_monitor: 警告あり"
       fi
 
   # Phase 3: コードファイル品質チェック（軽量版）
