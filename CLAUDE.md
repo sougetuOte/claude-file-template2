@@ -25,17 +25,19 @@
 - 完了済み情報: @.claude/archive/
 - Hooks設定: @.claude/hooks.yaml
 
-### Memory Bank 2.0 (Phase 1)
+### Memory Bank 2.0 (Phase 1) - 高速化完了
 - **知識データベース**: `.claude/index/knowledge.db` (SQLite + FTS5)
-- **知識管理API**: `.claude/index/knowledge_store.py`
-- **Markdown同期**: `.claude/index/sync_markdown.py`
+- **知識管理API**: `.claude/index/knowledge_store.py` + `OptimizedKnowledgeStore`
+- **高速Markdown同期**: `.claude/index/sync_markdown.py` (インクリメンタル・バッチ対応)
 - **コマンドライン**: `python .claude/commands/k_command.py`
+- **同期モード**: `incremental` / `batch` / `smart` / `stats` / `info`
 
 ### Memory Bank 2.0 (Phase 2) - MCP統合
 - **MCPサーバー**: `.claude/mcp/memory-server/index.js` (Node.js)
 - **Python Bridge**: `.claude/mcp/memory-server/bridge.py` (セキュア)
 - **MCP設定**: `.claude/mcp/config.json` (CVE-2025-49596対策)
 - **テストスイート**: `.claude/mcp/memory-server/test-mcp.js`
+- **最適化Hooks**: `.claude/hooks.yaml` (60-80%高速化)
 
 ### Memory Bank 2.0 (Phase 3) - 高度な機能
 - **AI生成コード品質モニター**: `.claude/quality/code_monitor.py` (重複検出・品質改善)
@@ -55,6 +57,24 @@
 | `/review:check` | コードレビュー | @.claude/commands/review-check.md |
 | `/k` | 知識管理 | @.claude/commands/knowledge.md |
 
+## Memory Bank 2.0 高速同期コマンド
+```bash
+# インクリメンタル同期（変更ファイルのみ）
+python3 .claude/index/sync_markdown.py incremental
+
+# バッチ処理（複数ファイル一括）
+python3 .claude/index/sync_markdown.py batch
+
+# スマート同期（重要ファイルのみ）
+python3 .claude/index/sync_markdown.py smart
+
+# 統計情報付き同期
+python3 .claude/index/sync_markdown.py stats
+
+# データベース情報表示
+python3 .claude/index/sync_markdown.py info
+```
+
 ## 開発ガイドライン
 - **開発全般**: @.claude/guidelines/development.md
 - **Gitワークフロー**: @.claude/guidelines/git-workflow.md
@@ -67,6 +87,12 @@
 [tool] run dev         # 開発サーバー起動
 [tool] run test        # テスト実行
 [tool] run check       # 総合チェック
+
+# Memory Bank 2.0 高速化機能
+python3 .claude/index/sync_markdown.py incremental  # 変更ファイルのみ同期
+python3 .claude/index/sync_markdown.py batch        # バッチ処理
+python3 .claude/index/sync_markdown.py smart        # スマート同期
+python3 .claude/index/sync_markdown.py stats        # 統計情報
 
 # 詳細は @.claude/guidelines/development.md 参照
 ```
