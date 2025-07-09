@@ -1,0 +1,156 @@
+{
+  "name": "Claude File Template DevContainer",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11-bookworm",
+  
+  // Features to add to the dev container
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "nodeGypDependencies": true
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": "1000",
+      "userGid": "1000"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": false
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "installTools": true,
+      "version": "3.11"
+    }
+  },
+
+  // Configure tool-specific properties
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": false,
+        "python.linting.flake8Enabled": true,
+        "python.formatting.provider": "black",
+        "python.formatting.blackArgs": ["--line-length=120"],
+        "editor.formatOnSave": true,
+        "editor.rulers": [80, 120],
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.associations": {
+          "*.md": "markdown",
+          "CLAUDE.md": "markdown",
+          ".clauderules": "markdown"
+        },
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+        }
+      },
+      "extensions": [
+        // Python
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.mypy-type-checker",
+        
+        // JavaScript/TypeScript
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        
+        // Markdown
+        "yzhang.markdown-all-in-one",
+        "DavidAnson.vscode-markdownlint",
+        "bierner.markdown-mermaid",
+        
+        // Git
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        
+        // General Development
+        "EditorConfig.EditorConfig",
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "Gruntfuggly.todo-tree",
+        "alefragnani.Bookmarks",
+        "christian-kohler.path-intellisense",
+        
+        // Database
+        "alexcvzz.vscode-sqlite",
+        
+        // YAML
+        "redhat.vscode-yaml",
+        
+        // Containers
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally
+  "forwardPorts": [],
+
+  // Use 'postCreateCommand' to run commands after the container is created
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // Use 'postStartCommand' to run commands after the container is started
+  "postStartCommand": "echo '🚀 DevContainer ready! Run \"claude --help\" to get started.'",
+
+  // Configure remote user
+  "remoteUser": "vscode",
+
+  // Environment variables
+  "containerEnv": {
+    "CLAUDE_HOOKS_ENABLED": "true",
+    "CLAUDE_PROJECT_ROOT": "${containerWorkspaceFolder}",
+    "CLAUDE_MEMORY_BANK_OPTIMIZED": "true",
+    "PYTHONPATH": "${containerWorkspaceFolder}/.claude:${containerWorkspaceFolder}",
+    "NODE_ENV": "development"
+  },
+
+  // Mounts
+  "mounts": [
+    // Preserve bash history
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.devcontainer-bash_history,target=/home/vscode/.bash_history,type=bind,consistency=cached",
+    // Share SSH keys
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached,readonly"
+  ],
+
+  // Run arguments
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+
+  // Additional features
+  "updateContentCommand": "echo 'Updating container content...'",
+  
+  // Lifecycle scripts
+  "onCreateCommand": "echo 'Container created successfully!'",
+  
+  // Host requirements
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "16gb"
+  }
+}
