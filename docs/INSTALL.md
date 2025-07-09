@@ -17,6 +17,7 @@ git --version       # Git確認
 ### オプション要件
 - **Node.js**: 18以上（MCP統合機能用）
 - **npm/yarn**: Node.jsパッケージ管理
+- **Vibe Logger**: AI最適化ログシステム（デバッグ効率化用）
 
 ## 🚀 インストール方法
 
@@ -97,6 +98,30 @@ nano .claude/core/overview.md     # プロジェクト概要
 ```
 
 ## 🔧 オプション機能の設定
+
+### Vibe Logger統合（AI最適化ログシステム）
+
+```bash
+# Python版のインストール
+pip install vibelogger
+
+# Node.js/TypeScript版のインストール
+npm install -g vibelogger
+
+# インストール確認
+python -c "import vibelogger; print('Python版: OK')"
+node -e "require('vibelogger'); console.log('Node.js版: OK')"
+
+# CLIツールのテスト
+python .claude/vibe/sync_vibe_logs.py --help
+
+# 使用例の実行（オプション）
+python .claude/vibe/example_usage.py
+node .claude/vibe/example_usage.ts
+```
+
+#### DevContainerを使用する場合
+DevContainerでは自動的にインストールされるため、手動インストールは不要です。
 
 ### MCP統合（Phase 2機能）
 

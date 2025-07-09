@@ -5,6 +5,65 @@
 形式は [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) に基づき、
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) に従っています。
 
+## [2.1.1] - 2025-07-09
+
+### 🐳 DevContainer完全対応
+
+#### 新機能
+- **DevContainer環境**: VS Code + Dockerで一貫性のある開発環境を実現
+- **自動環境構築**: Python 3.11, Node.js 20, SQLite, ripgrepを自動インストール
+- **VS Code拡張機能**: 20種類以上の開発支援拡張機能を自動設定
+- **シェル設定**: Zsh/Bash両対応の便利なエイリアス設定
+- **セキュリティ**: SSH鍵の読み取り専用マウント、シークレット管理ガイド
+
+#### DevContainer設定ファイル
+```
+.devcontainer/
+├── devcontainer.json      # メイン設定
+├── docker-compose.yml     # 複数サービス対応
+├── Dockerfile            # カスタマイズ用
+├── post-create.sh        # 環境セットアップ
+├── .env.example          # 環境変数テンプレート
+├── secrets-management.md  # シークレット管理
+├── README.md             # 運用ガイド
+├── test-checklist.md     # 動作確認手順
+└── shell-config/         # シェル設定
+```
+
+#### 開発体験の向上
+- **即座に開発開始**: コンテナ起動後すぐに使える環境
+- **Memory Bank自動初期化**: 初回起動時に知識ベースを構築
+- **便利なエイリアス**: `ks`（検索）、`devinfo`（環境情報）など
+- **自動同期**: ディレクトリ移動時のMemory Bank自動同期
+
+### 🚀 Vibe Logger統合（実験的機能）
+
+#### 新機能
+- **AI最適化ログシステム**: 構造化ログでAIアシスタントがエラー文脈を完全理解
+- **Memory Bank連携**: vibe-loggerのログを自動的に知識ベースに変換・保存
+- **自動エラー記録**: Python/Node.jsエラー時の詳細コンテキストを自動キャプチャ
+- **AI-TODOシステム**: `AI-TODO`, `AI-FIXME`, `AI-DEBUG`タグによるAIへの指示
+
+#### 統合内容
+```
+.claude/vibe/
+├── README.md           # vibe-logger詳細ガイド
+├── sync_vibe_logs.py   # Memory Bank同期スクリプト
+├── example_usage.py    # Python使用例
+└── example_usage.ts    # TypeScript/Node.js使用例
+```
+
+#### 自動化
+- **hooks.yaml統合**: エラー発生時に自動的にvibe-loggerで記録
+- **DevContainer対応**: `pip install vibelogger` と `npm install -g vibelogger` を自動実行
+- **CLIツール**: `python3 .claude/vibe/sync_vibe_logs.py` コマンドでログ管理
+
+### 📝 ドキュメント更新
+- **README.md**: v2.1対応、DevContainer情報とVibe Logger機能追加
+- **CLAUDE.md**: DevContainerクイックスタートとVibe Logger統合セクション追加
+- **.gitignore**: DevContainer関連ファイルの除外設定
+- **vibe/README.md**: Vibe Loggerの詳細な使用ガイド
+
 ## [2.1.0] - 2025-07-09
 
 ### ⚡ パフォーマンス大幅改善 (Memory Bank同期効率化)

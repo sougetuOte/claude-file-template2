@@ -292,6 +292,46 @@ git reset --hard HEAD~1  # 移行コミット前に戻る
 3. **Week 3**: 自動化機能（Hooks、自動整理）
 4. **Week 4**: MCP統合（高度な機能）
 
+### Vibe Logger導入（オプション）
+
+AI最適化ログシステムを既存プロジェクトに追加：
+
+```bash
+# 1. vibe-logger関連ファイルのコピー
+cp -r temp-v2/.claude/vibe .claude/
+
+# 2. インストール
+pip install vibelogger        # Python版
+npm install -g vibelogger     # Node.js版（オプション）
+
+# 3. hooks.yamlにVibe Logger統合を追加
+cat >> .claude/hooks.yaml << 'EOF'
+
+  # Vibe Logger統合: Pythonエラー時の構造化ログ
+  - event: PostToolUse
+    matcher:
+      tool: Bash
+      command_contains: "python"
+    command: |
+      if [ $CLAUDE_EXIT_CODE -ne 0 ] && python3 -c "import vibelogger" 2>/dev/null; then
+        python3 -c "
+import sys
+sys.path.insert(0, '.claude')
+from vibe.sync_vibe_logs import vibe_log
+vibe_log(
+    level='ERROR',
+    operation='python_execution',
+    message='Pythonスクリプト実行エラー',
+    context={'command': '$CLAUDE_COMMAND', 'exit_code': $CLAUDE_EXIT_CODE},
+    human_note='AI-DEBUG: エラーの原因を調査してください'
+)" 2>/dev/null || true
+      fi
+EOF
+
+# 4. 動作確認
+python .claude/vibe/sync_vibe_logs.py --help
+```
+
 ### 設定の最適化
 ```bash
 # プロジェクト固有の調整

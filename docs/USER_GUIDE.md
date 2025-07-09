@@ -9,7 +9,8 @@
 5. [コード品質監視](#コード品質監視)
 6. [セキュリティ機能](#セキュリティ機能)
 7. [自動化機能](#自動化機能)
-8. [トラブルシューティング](#トラブルシューティング)
+8. [Vibe Logger（AI最適化ログ）](#vibe-loggerai最適化ログ)
+9. [トラブルシューティング](#トラブルシューティング)
 
 ## 🎯 基本概念
 
@@ -426,6 +427,86 @@ python .claude/agents/simple_coordinator.py workflow "Fix bug" "debug"
   "tools_needed": ["Read", "Grep", "Edit", "Bash"]
 }
 ```
+
+## 🚀 Vibe Logger（AI最適化ログ）
+
+### 概要
+Vibe Loggerは、AIアシスタントがエラー文脈を完全に理解できるよう設計された構造化ログシステムです。
+
+### 基本的な使い方
+
+#### Python版
+```python
+from .claude.vibe.sync_vibe_logs import vibe_log
+
+# 構造化ログの記録
+vibe_log(
+    level="ERROR",
+    operation="database.connection",
+    message="接続エラー",
+    context={
+        "host": "localhost",
+        "port": 5432,
+        "error_code": "ECONNREFUSED"
+    },
+    human_note="AI-FIXME: 接続プールの設定を見直してください"
+)
+```
+
+#### TypeScript/Node.js版
+```typescript
+import { createFileLogger } from 'vibelogger';
+
+const logger = createFileLogger('my_project');
+
+logger.error({
+    operation: 'api.request',
+    message: 'APIタイムアウト',
+    context: {
+        endpoint: '/api/users',
+        timeout: 30000
+    },
+    humanNote: 'AI-DEBUG: タイムアウト設定を確認'
+});
+```
+
+### AI-TODOシステム
+以下のタグを使用してAIに特定のアクションを依頼：
+- `AI-TODO`: 実装や改善の提案
+- `AI-FIXME`: バグ修正の提案
+- `AI-DEBUG`: デバッグ支援
+- `AI-OPTIMIZE`: パフォーマンス改善
+- `AI-REVIEW`: コードレビュー
+
+### CLIコマンド
+```bash
+# ログの作成
+python .claude/vibe/sync_vibe_logs.py log error "api.timeout" "タイムアウトエラー"
+
+# ログの検索
+python .claude/vibe/sync_vibe_logs.py search "error"
+
+# エラーサマリー
+python .claude/vibe/sync_vibe_logs.py summary --days 7
+```
+
+### 自動エラー記録
+hooks.yamlによりPython/Node.jsエラー時に自動的に記録されます：
+- エラーコンテキストの完全キャプチャ
+- Memory Bankへの自動同期
+- AI向けデバッグノートの生成
+
+### エラーハンドラー
+```python
+from .claude.vibe.sync_vibe_logs import vibe_error_handler
+
+@vibe_error_handler
+def risky_operation(data):
+    # エラーが自動的にログされる
+    return process_data(data)
+```
+
+詳細な使用例は `.claude/vibe/example_usage.py` と `.claude/vibe/example_usage.ts` を参照してください。
 
 ## 📊 MCP統合（Phase 2機能）
 
