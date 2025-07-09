@@ -45,6 +45,12 @@
 - **知識自動整理システム**: `.claude/index/auto_organize.py` (パターン抽出・アーカイブ)
 - **自動実行Hooks**: `.claude/hooks.yaml` (コード変更時の品質チェック)
 
+### Vibe Logger統合 (実験的機能)
+- **構造化ログシステム**: `.claude/vibe/` (AI理解最適化ログ)
+- **Memory Bank同期**: `.claude/vibe/sync_vibe_logs.py` (ログの知識化)
+- **エラー自動記録**: Pythonエラー時の詳細コンテキスト保存
+- **使用例**: `.claude/vibe/example_usage.py` (実践的なログパターン)
+
 ## カスタムコマンド
 | コマンド | 用途 | 詳細 |
 |---------|------|------|
@@ -75,10 +81,45 @@ python3 .claude/index/sync_markdown.py stats
 python3 .claude/index/sync_markdown.py info
 ```
 
+## Vibe Logger コマンド (実験的機能)
+```bash
+# 構造化ログの作成
+python3 .claude/vibe/sync_vibe_logs.py log error "操作名" "メッセージ" --note "AI-TODO: 改善案"
+
+# ログ検索
+python3 .claude/vibe/sync_vibe_logs.py search "エラー"
+
+# エラーサマリー表示
+python3 .claude/vibe/sync_vibe_logs.py summary --days 7
+```
+
 ## 開発ガイドライン
 - **開発全般**: @.claude/guidelines/development.md
 - **Gitワークフロー**: @.claude/guidelines/git-workflow.md
 - **テスト・品質**: @.claude/guidelines/testing-quality.md
+
+## DevContainer開発環境
+- **セットアップ**: VS Code + Docker Desktopが必要
+- **起動方法**: `Dev Containers: Reopen in Container`
+- **含まれるツール**: Python 3.11, Node.js 20, SQLite, ripgrep
+- **自動設定**: VS Code拡張機能、開発ツール、Memory Bank
+- **ドキュメント**: @.devcontainer/README.md
+- **環境変数**: `.devcontainer/.env.example`をコピーして設定
+
+### DevContainerクイックスタート
+```bash
+# 1. VS Codeでプロジェクトを開く
+code .
+
+# 2. コマンドパレット (F1) から実行
+Dev Containers: Reopen in Container
+
+# 3. 初回は3-5分待機（ビルド完了まで）
+
+# 4. 開発開始！
+python3 .claude/index/sync_markdown.py smart  # Memory Bank同期
+devinfo  # 環境情報表示
+```
 
 ## 実行コマンド一覧
 ```bash
